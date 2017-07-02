@@ -1,7 +1,3 @@
-// CS1102-Cities.cpp : Defines the entry point for the console application.
-//
-
-#include <cstdlib>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,6 +9,11 @@
 #include <vector>
 #include "City.h"
 
+//1.-inicio:Para map
+#include <string>
+#include <utility>
+#include <map>
+//1.-fin:Para map
 using namespace std;
 
 void showMenu();
@@ -33,6 +34,11 @@ void setListToFile();
 
 static list <City> cities;
 static list <City>::iterator it;
+
+//2.-inicio:Para map
+typedef pair<string, char> componente;
+map<string, char> directorio;
+//2.-fin:Para map
 
 int main()
 {
@@ -61,7 +67,8 @@ int main()
 }
 
 void showMenu(){
-	cout << endl;
+    
+    cout << endl;
 	cout << "|--------------------------------------------------------|" << endl;
 	cout << "|Menu                                                    |" << endl;
 	cout << "|~ ~ ~                                                   |" << endl;
@@ -108,19 +115,37 @@ City addCity() {
 	
 	City addedA(name, x, y, c);
 	cities.push_back(addedA);
+    //inicio:map-inserta datos
+    directorio.insert( componente(name, c));
+    //fin:map-inserta datos
+
 	return addedA;
 }
 
 void deleteCity() {
 	string cityName, name;
 	cout << "- Ingrese el nombre de la ciudad a eliminar: "; cin >> name;
-	for (it = cities.begin(); it != cities.end(); ++it) {
-		cityName = (*it).getName();
-		if (name.compare(cityName) == 0) {
-			cities.erase(it);
-			return;
-		}
-	}
+	//inicio:mapverifica existencia de archivo
+    string s=name;
+    map<string, char>::iterator p = directorio.find(s);
+    if(p!=directorio.end())
+    {
+    //fin.map-verifica exitencia de registro
+        for (it = cities.begin(); it != cities.end(); ++it) {
+		    cityName = (*it).getName();
+		    if (name.compare(cityName) == 0) {
+			    cities.erase(it);
+                directorio.erase(s);			    
+			    return;
+		    }
+	    }
+   	//inicio:mapverifica existencia de archivo
+    }else{
+          cout << s << " no esta en el directorio.\n";
+          system("pause");
+          return;
+    }
+    //fin.map-verifica exitencia de registro
 }
 
 void listTop100() {
@@ -207,6 +232,9 @@ void getListFromFile() {
 			c = line[0];
 			City add(name, x, y, c);
 			cities.push_back(add);
+            //inicio:map-Inicializa con datos
+            directorio.insert( componente(name, c));
+            //fin:map-Inicializa con datos
 		}
 	}
 	else cout << "No se pudo abrir el archivo de ciudades (Ciudades.csv)" << endl;
@@ -225,3 +253,5 @@ void setListToFile() {
 	}
 	file.close();
 }
+
+
